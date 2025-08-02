@@ -17,4 +17,6 @@ social media alongside traditional financial models.
 
 ### Data Collection
 
-- **Market Data Collection**: Fetches historical stock price data.
+- [**Market Data Collection**](/src/data_collection/market_data.py): Fetches historical stock price data and financial factors:
+  - Stock price data from Yahoo Finance
+  - Fama-French three-factor model data directly from Kenneth French's data library
