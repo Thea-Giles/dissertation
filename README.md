@@ -24,6 +24,9 @@ social media alongside traditional financial models.
 
 ## Components
 
+### Notebook
+[Jupyter Notebook](/notebooks/dissertation.ipynb) of the process.
+
 ### Data Collection
 
 - [**Market Data Collection**](/src/data_collection/market_data.py): Fetches historical stock price data and financial factors:
