@@ -208,3 +208,8 @@ __marimo__/
 
 # PyCharm
 /.idea
+/src/data_collection/data/
+/external_data/
+
+**/*.csv
+**/*.json

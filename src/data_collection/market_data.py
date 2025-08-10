@@ -1,8 +1,6 @@
 """
 Market Data Collection Module
-
 """
-
 import datetime
 import io
 import zipfile
@@ -199,11 +197,13 @@ def save_market_data(data: Union[pd.DataFrame, Dict[str, pd.DataFrame]], filenam
 
 def main():
     # Set date range (2020-2022)
-    start_date = "2020-01-01"
+    start_date = "2015-01-01"
     end_date = "2022-12-31"
 
     # Get market index data (S&P 500)
     sp500_data = get_stock_data("^GSPC", start_date, end_date)
+
+    print(sp500_data.values[45])
 
     # Get factor data from Kenneth French's data library
     french_data = get_factor_data(start_date, end_date)
