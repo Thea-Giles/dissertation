@@ -53,3 +53,18 @@ social media alongside traditional financial models.
        - Source: External dataset (tweets_remaining_09042020_16072020.csv)
        - Coverage: Various stocks and financial markets
        - Note: This dataset contains multi-line tweets that are cleaned using the `clean_tweets_remaining` function
+
+## Model Comparison: Fama-French vs XGBoost
+
+This project includes scripts to gather data and compare the predictive performance of a traditional Fama-French regression against an XGBoost model on market returns.
+
+1. Gather data (S&P 500 + Fama-French 3 factors) and save to src/data_collection/data:
+   - python -m src.run_data_gathering --start 2014-01-01 --end 2024-12-31 --ticker ^GSPC --outdir src/data_collection/data
+
+2. Run the comparison and optionally save results to JSON:
+   - python -m src.run_model_comparison --test-size 0.2 --out results.json
+
+Notes:
+- Ensure xgboost is installed: pip install xgboost
+- The comparison uses the latest CSV matching src/data_collection/data/fama_french_factors_*.csv.
+- The split is time-ordered; both models are evaluated on the same out-of-sample horizon.

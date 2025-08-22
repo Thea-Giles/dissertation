@@ -199,8 +199,8 @@ def save_market_data(data: Union[pd.DataFrame, Dict[str, pd.DataFrame]], filenam
 
 def main():
     # Set date range (2020-2022)
-    start_date = "2020-01-01"
-    end_date = "2022-12-31"
+    start_date = "2014-01-01"
+    end_date = "2024-12-31"
 
     # Get market index data (S&P 500)
     sp500_data = get_stock_data("^GSPC", start_date, end_date)

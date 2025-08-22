@@ -1,8 +1,8 @@
 """
-Sentiment Analysis Module
+Sentiment Analysis Module using DistilBERT
 
-This module handles sentiment analysis of financial text data using FinBERT,
-a pre-trained NLP model specifically designed for financial text.
+This module handles sentiment analysis of text data using DistilBERT,
+a distilled version of BERT that's smaller and faster while retaining most of BERT's performance.
 """
 
 import pandas as pd
@@ -15,10 +15,10 @@ import time
 from tqdm import tqdm
 
 
-class FinBERTSentimentAnalyzer:
-    def __init__(self, model_name: str = "ProsusAI/finbert"):
+class DistilBERTSentimentAnalyzer:
+    def __init__(self, model_name: str = "distilbert-base-uncased-finetuned-sst-2-english"):
         """
-        Initialize the FinBERT sentiment analyzer.
+        Initialize the DistilBERT sentiment analyzer.
 
         Args:
             model_name: Name of the pre-trained model to use
@@ -32,8 +32,8 @@ class FinBERTSentimentAnalyzer:
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
         self.model.to(self.device)
 
-        # FinBERT label mapping
-        self.labels = ["negative", "neutral", "positive"]
+        # DistilBERT SST-2 label mapping (binary sentiment)
+        self.labels = ["negative", "positive"]
 
     def analyze_text(self, text: str) -> Dict[str, Any]:
         """
@@ -61,14 +61,19 @@ class FinBERTSentimentAnalyzer:
         predicted_class_id = int(np.argmax(probs))
         predicted_label = self.labels[predicted_class_id]
 
-        # Create result dictionary
+        # Create result dictionary with the same format as FinBERT
+        # For compatibility, we'll map the binary sentiment to the three-class format
+        # by setting neutral_score to 0
+        negative_score = float(probs[0])
+        positive_score = float(probs[1])
+        
         result = {
             "text": text,
             "sentiment": predicted_label,
-            "negative_score": float(probs[0]),
-            "neutral_score": float(probs[1]),
-            "positive_score": float(probs[2]),
-            "sentiment_score": float(probs[2] - probs[0])  # positive - negative
+            "negative_score": negative_score,
+            "neutral_score": 0.0,  # DistilBERT SST-2 doesn't have neutral class
+            "positive_score": positive_score,
+            "sentiment_score": float(positive_score - negative_score)  # positive - negative
         }
 
         return result
@@ -115,13 +120,16 @@ class FinBERTSentimentAnalyzer:
                 predicted_class_id = int(np.argmax(probs[j]))
                 predicted_label = self.labels[predicted_class_id]
 
+                negative_score = float(probs[j][0])
+                positive_score = float(probs[j][1])
+
                 result = {
                     "text": text,
                     "sentiment": predicted_label,
-                    "negative_score": float(probs[j][0]),
-                    "neutral_score": float(probs[j][1]),
-                    "positive_score": float(probs[j][2]),
-                    "sentiment_score": float(probs[j][2] - probs[j][0])  # positive - negative
+                    "negative_score": negative_score,
+                    "neutral_score": 0.0,  # DistilBERT SST-2 doesn't have neutral class
+                    "positive_score": positive_score,
+                    "sentiment_score": float(positive_score - negative_score)  # positive - negative
                 }
 
                 results.append(result)
@@ -388,7 +396,7 @@ def main():
     from pathlib import Path
     
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description='Analyze sentiment of tweets')
+    parser = argparse.ArgumentParser(description='Analyze sentiment of tweets using DistilBERT')
     parser.add_argument('--batch-size', type=int, default=32, help='Batch size for processing')
     parser.add_argument('--no-parallel', action='store_true', help='Disable parallel processing')
     parser.add_argument('--workers', type=int, default=4, help='Number of parallel workers')
@@ -406,9 +414,9 @@ def main():
     # Define file paths
     # Use absolute paths based on the repository root
     repo_root = Path(__file__).parent.parent.parent  # Go up three levels from this file
-    input_file = repo_root / "src" / "data_collection" / "data" / "combined_cleaned_tweets2.csv"
+    input_file = repo_root / "src" / "data_collection" / "data" / "combined_cleaned_tweets2_part8.csv"
     output_dir = Path(__file__).parent / "data"  # Create data dir in the same directory as this script
-    output_file = output_dir / "combined_cleaned_tweets_with_sentiment.csv"
+    output_file = output_dir / "combined_cleaned_tweets_with_distilbert_sentiment_part8.csv"
     
     print(f"Repository root: {repo_root}")
     print(f"Looking for input file at: {input_file}")
@@ -426,7 +434,7 @@ def main():
     print(f"Columns: {df.columns.tolist()}")
     
     # Initialize analyzer
-    analyzer = FinBERTSentimentAnalyzer()
+    analyzer = DistilBERTSentimentAnalyzer()
     
     # First, test with a small subset
     print("\nTesting with 5 tweets...")
